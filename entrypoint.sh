@@ -1,5 +1,7 @@
 #!/bin/sh
 set -eu
+sleep 1
+echo "NXS: Pterodactyl entrypoint active."
 
 export HOME=/home/container
 export OLLAMA_MODELS="${OLLAMA_MODELS:-/home/container/.ollama/models}"
