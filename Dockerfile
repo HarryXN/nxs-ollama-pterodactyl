@@ -6,11 +6,7 @@ ENV HOME=/home/container \
 
 WORKDIR /home/container
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends tini \
-    && rm -rf /var/lib/apt/lists/*
-
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT ["/usr/bin/tini", "-g", "--"]
-CMD ["/entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
+CMD ["serve"]
