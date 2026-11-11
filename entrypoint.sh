@@ -4,21 +4,23 @@ set -eu
 export HOME=/home/container
 export OLLAMA_MODELS="${OLLAMA_MODELS:-/home/container/.ollama/models}"
 
-if [ "${1:-}" != "serve" ]; then
-    exec /bin/ollama "$@"
+startup="${STARTUP:-${1:-serve}}"
+if [ "$startup" != "serve" ]; then
+    exec /bin/sh -c "$startup"
 fi
 
 port="${SERVER_PORT:-8025}"
 export OLLAMA_HOST="0.0.0.0:${port}"
-
-/bin/ollama serve &
-server_pid=$!
 
 stop_server() {
     kill -TERM "$server_pid" 2>/dev/null || true
     wait "$server_pid" 2>/dev/null || true
 }
 trap stop_server INT TERM
+
+echo "NXS: starting Ollama on allocated port ${port}..."
+/bin/ollama serve &
+server_pid=$!
 
 echo "NXS: waiting for Ollama on port ${port}..."
 until OLLAMA_HOST="127.0.0.1:${port}" /bin/ollama list >/dev/null 2>&1; do
