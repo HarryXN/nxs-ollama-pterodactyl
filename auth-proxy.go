@@ -21,6 +21,14 @@ func main() {
 	if port == "" {
 		port = "8025"
 	}
+	certFile := os.Getenv("NXS_TLS_CERT_FILE")
+	if certFile == "" {
+		certFile = "/home/container/tls/fullchain.pem"
+	}
+	keyFile := os.Getenv("NXS_TLS_KEY_FILE")
+	if keyFile == "" {
+		keyFile = "/home/container/tls/privkey.pem"
+	}
 	listen := ":" + port
 	target, _ := url.Parse("http://127.0.0.1:11434")
 	proxy := httputil.NewSingleHostReverseProxy(target)
@@ -43,6 +51,6 @@ func main() {
 		ReadHeaderTimeout: 10 * time.Second,
 		IdleTimeout:       120 * time.Second,
 	}
-	log.Printf("NXS authenticated Ollama gateway listening on %s", listen)
-	log.Fatal(server.ListenAndServe())
+	log.Printf("NXS authenticated HTTPS Ollama gateway listening on %s", listen)
+	log.Fatal(server.ListenAndServeTLS(certFile, keyFile))
 }
