@@ -14,6 +14,13 @@ if [ "${#token}" -lt 32 ]; then
     exit 1
 fi
 
+cert_file="${NXS_TLS_CERT_FILE:-/home/container/tls/fullchain.pem}"
+key_file="${NXS_TLS_KEY_FILE:-/home/container/tls/privkey.pem}"
+if [ ! -r "$cert_file" ] || [ ! -r "$key_file" ]; then
+    echo "NXS ERROR: HTTPS certificate files are missing or unreadable. Upload the origin certificate and private key to the configured TLS paths."
+    exit 1
+fi
+
 startup="${STARTUP:-${1:-serve}}"
 if [ "$startup" != "serve" ]; then
     echo "NXS ERROR: startup command must be 'serve'; custom commands bypass the protected gateway."
