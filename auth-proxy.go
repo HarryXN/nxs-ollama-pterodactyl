@@ -32,6 +32,14 @@ func main() {
 	listen := ":" + port
 	target, _ := url.Parse("http://127.0.0.1:11434")
 	proxy := httputil.NewSingleHostReverseProxy(target)
+	// Ollama validates the Host header as a DNS-rebinding defense. The incoming
+	// Host is the public HTTPS gateway hostname, so rewrite it to the private
+	// loopback upstream after routing to avoid Ollama rejecting authenticated calls.
+	director := proxy.Director
+	proxy.Director = func(r *http.Request) {
+		director(r)
+		r.Host = target.Host
+	}
 	proxy.FlushInterval = -1
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
